@@ -38,8 +38,9 @@ public class NNNcommands extends ListenerAdapter {
 
                 if(member.getRoles().contains(survivingRole)){
                     event.getGuild().removeRoleFromMember(member, survivingRole).queue();
+                    event.getGuild().addRoleToMember(member, failRole).queue();
+                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> We can't all survive..").queue();
                 }
-                event.getGuild().addRoleToMember(member, failRole).queue();
                 return;
             }
 
@@ -49,11 +50,12 @@ public class NNNcommands extends ListenerAdapter {
                 if(member == null) return;
 
                 if(member.getRoles().contains(failRole)){
-                    event.getGuild().removeRoleFromMember(member, failRole).queue();
+                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> You cannot rejoin after failing...").queue();
 
                 }
                 if(!member.getRoles().contains(survivingRole)){
                     event.getGuild().addRoleToMember(member, survivingRole).queue();
+                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> Goodluck...").queue();
                 }
             }
 
