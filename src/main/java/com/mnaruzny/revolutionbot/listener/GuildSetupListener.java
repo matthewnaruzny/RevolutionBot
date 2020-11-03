@@ -9,6 +9,12 @@ import java.awt.*;
 
 public class GuildSetupListener extends ListenerAdapter {
 
+    @Override
+    public void onGuildJoin(GuildJoinEvent event){
+        // Check if role exists
+        checkAndFixRoles(event.getGuild());
+    }
+
     public static void checkAndFixRoles(Guild guild){
 
         if(guild.getRolesByName("fail", true).size() == 0){
