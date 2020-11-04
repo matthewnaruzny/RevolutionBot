@@ -57,6 +57,13 @@ public class NNNcommands extends ListenerAdapter {
                     event.getGuild().addRoleToMember(member, survivingRole).queue();
                     message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> Goodluck...").queue();
                 }
+                return;
+            }
+
+            if(command.equalsIgnoreCase("help")){
+                message.getChannel().sendMessage("Help Menu Things...\n" +
+                        "r!nnn join - Join the challenge\n" +
+                        "r!nnn fail - Admit defeat...\n").queue();
             }
 
         }
