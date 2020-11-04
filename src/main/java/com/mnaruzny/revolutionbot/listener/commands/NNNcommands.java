@@ -51,6 +51,7 @@ public class NNNcommands extends ListenerAdapter {
 
                 if(member.getRoles().contains(failRole)){
                     message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> You cannot rejoin after failing...").queue();
+                    return;
 
                 }
                 if(!member.getRoles().contains(survivingRole)){
