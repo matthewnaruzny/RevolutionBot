@@ -58,6 +58,45 @@ public class NNNStatus {
         }
     }
 
+    public boolean hasUserFailed(){
+        try {
+            Connection conn = new DataConnector(config).getConnection();
+            String sql = "SELECT userFailed FROM revolutionbot.rv_nnnstatus WHERE discordUserId = ? AND discordGuildId = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setLong(1, member.getIdLong());
+            pstmt.setLong(2, member.getGuild().getIdLong());
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()){
+                return rs.getBoolean("userFailed");
+            } else {
+                addToDB();
+            }
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return false;
+    }
+
+    public void setUserFailed(boolean failed){
+
+        if(hasUserFailed() == failed) return;
+
+        try {
+            Connection conn = new DataConnector(config).getConnection();
+            String sql = "UPDATE revolutionbot.rv_nnnStatus SET userFailed = ? WHERE discordUserId = ? AND discordGuildId = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setBoolean(1, failed);
+            pstmt.setLong(2, member.getIdLong());
+            pstmt.setLong(3, member.getGuild().getIdLong());
+            pstmt.execute();
+
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
     private void addToDB(){
         try {
             Connection conn = new DataConnector(config).getConnection();

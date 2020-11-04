@@ -50,6 +50,7 @@ public class NNNcommands extends ListenerAdapter {
                     event.getGuild().removeRoleFromMember(member, survivingRole).queue();
                     event.getGuild().addRoleToMember(member, failRole).queue();
                     message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> We can't all survive..").queue();
+                    NNNStatus.getStatus(config, member).setUserFailed(true);
                 }
                 return;
             }
