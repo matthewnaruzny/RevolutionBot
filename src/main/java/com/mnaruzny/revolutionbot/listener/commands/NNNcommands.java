@@ -67,6 +67,7 @@ public class NNNcommands extends ListenerAdapter {
                 if(!member.getRoles().contains(survivingRole)){
                     event.getGuild().addRoleToMember(member, survivingRole).queue();
                     message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> Goodluck...").queue();
+                    NNNStatus.getStatus(config, member).setUserJoined(true);
                 }
                 return;
             }

@@ -40,6 +40,24 @@ public class NNNStatus {
         return false;
     }
 
+    public void setUserJoined(boolean status){
+
+        if(hasUserJoined() == status) return;
+
+        try {
+            Connection conn = new DataConnector(config).getConnection();
+            String sql = "UPDATE revolutionbot.rv_nnnStatus SET userJoined = ? WHERE discordUserId = ? AND discordGuildId = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setBoolean(1, status);
+            pstmt.setLong(2, member.getIdLong());
+            pstmt.setLong(3, member.getGuild().getIdLong());
+            pstmt.execute();
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+    }
+
     private void addToDB(){
         try {
             Connection conn = new DataConnector(config).getConnection();
