@@ -26,7 +26,7 @@ public class MainBot {
 
         // Register Listeners
         jda.addEventListener(new GeneralCommandListener());
-        jda.addEventListener(new NNNcommands());
+        jda.addEventListener(new NNNcommands(config));
 
     }
 }

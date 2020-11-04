@@ -7,7 +7,15 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.util.Properties;
+
 public class NNNcommands extends ListenerAdapter {
+
+    Properties config;
+
+    public NNNcommands(Properties config){
+        this.config = config;
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event){

@@ -13,7 +13,7 @@ public class DataConnector {
         this.config = config;
     }
 
-    private Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
 
         String ip = config.getProperty("dbIp");
         String url = ("jdbc:mariadb://" + ip);
