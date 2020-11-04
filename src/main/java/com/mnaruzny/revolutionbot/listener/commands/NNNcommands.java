@@ -1,6 +1,8 @@
 package com.mnaruzny.revolutionbot.listener.commands;
 
 import com.mnaruzny.revolutionbot.listener.GuildSetupListener;
+import com.mnaruzny.revolutionbot.registry.entities.NNNStatus;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -67,6 +69,15 @@ public class NNNcommands extends ListenerAdapter {
                     message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> Goodluck...").queue();
                 }
                 return;
+            }
+
+            if(command.equalsIgnoreCase("info")){
+                EmbedBuilder eb = new EmbedBuilder();
+                NNNStatus s = NNNStatus.getStatus(config, message.getMember());
+                eb.setTitle("NNN User Status");
+                eb.addField("Username", message.getAuthor().getName(), false);
+                eb.addField("Joined", (s.hasUserJoined()) ? "True" : "False", false);
+                message.getChannel().sendMessage(eb.build()).queue();
             }
 
             if(command.equalsIgnoreCase("help")){
