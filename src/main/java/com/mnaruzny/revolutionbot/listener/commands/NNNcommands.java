@@ -1,13 +1,23 @@
 package com.mnaruzny.revolutionbot.listener.commands;
 
 import com.mnaruzny.revolutionbot.listener.GuildSetupListener;
+import com.mnaruzny.revolutionbot.registry.entities.NNNStatus;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.util.Properties;
+
 public class NNNcommands extends ListenerAdapter {
+
+    private Properties config;
+
+    public NNNcommands(Properties config){
+        this.config = config;
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event){
@@ -36,10 +46,15 @@ public class NNNcommands extends ListenerAdapter {
                 Member member = event.getMember();
                 if(member == null) return;
 
-                if(member.getRoles().contains(survivingRole)){
+                NNNStatus status = NNNStatus.getStatus(config, member);
+
+                if(status.hasUserJoined()){
                     event.getGuild().removeRoleFromMember(member, survivingRole).queue();
                     event.getGuild().addRoleToMember(member, failRole).queue();
                     message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> We can't all survive..").queue();
+                    status.setUserFailed(true);
+                } else {
+                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> You never joined... weakling").queue();
                 }
                 return;
             }
@@ -49,15 +64,33 @@ public class NNNcommands extends ListenerAdapter {
                 Member member = event.getMember();
                 if(member == null) return;
 
-                if(member.getRoles().contains(failRole)){
-                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> You cannot rejoin after failing...").queue();
-                    return;
+                NNNStatus status = NNNStatus.getStatus(config, member);
 
+                if(status.hasUserFailed()){
+                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> You cannot rejoin after failing...").queue();
+                    event.getGuild().addRoleToMember(member, failRole).queue();
+                    return;
                 }
-                if(!member.getRoles().contains(survivingRole)){
+
+                if(!status.hasUserJoined()){
                     event.getGuild().addRoleToMember(member, survivingRole).queue();
                     message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> Goodluck...").queue();
+                    status.setUserJoined(true);
+                } else {
+                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> You've already joined!").queue();
+                    event.getGuild().addRoleToMember(member, survivingRole).queue();
                 }
+                return;
+            }
+
+            if(command.equalsIgnoreCase("info")){
+                EmbedBuilder eb = new EmbedBuilder();
+                NNNStatus s = NNNStatus.getStatus(config, message.getMember());
+                eb.setTitle("NNN User Status");
+                eb.addField("Username", message.getAuthor().getName(), false);
+                eb.addField("Joined", (s.hasUserJoined()) ? "True" : "False", false);
+                eb.addField("Failed", (s.hasUserFailed()) ? "True" : "False", false);
+                message.getChannel().sendMessage(eb.build()).queue();
                 return;
             }
 
