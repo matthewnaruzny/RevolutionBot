@@ -13,7 +13,7 @@ import java.util.Properties;
 
 public class NNNcommands extends ListenerAdapter {
 
-    Properties config;
+    private Properties config;
 
     public NNNcommands(Properties config){
         this.config = config;
@@ -46,11 +46,15 @@ public class NNNcommands extends ListenerAdapter {
                 Member member = event.getMember();
                 if(member == null) return;
 
-                if(member.getRoles().contains(survivingRole)){
+                NNNStatus status = NNNStatus.getStatus(config, member);
+
+                if(status.hasUserJoined()){
                     event.getGuild().removeRoleFromMember(member, survivingRole).queue();
                     event.getGuild().addRoleToMember(member, failRole).queue();
                     message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> We can't all survive..").queue();
-                    NNNStatus.getStatus(config, member).setUserFailed(true);
+                    status.setUserFailed(true);
+                } else {
+                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> You never joined... weakling").queue();
                 }
                 return;
             }
@@ -60,15 +64,21 @@ public class NNNcommands extends ListenerAdapter {
                 Member member = event.getMember();
                 if(member == null) return;
 
-                if(member.getRoles().contains(failRole)){
-                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> You cannot rejoin after failing...").queue();
-                    return;
+                NNNStatus status = NNNStatus.getStatus(config, member);
 
+                if(status.hasUserFailed()){
+                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> You cannot rejoin after failing...").queue();
+                    event.getGuild().addRoleToMember(member, failRole).queue();
+                    return;
                 }
-                if(!member.getRoles().contains(survivingRole)){
+
+                if(!status.hasUserJoined()){
                     event.getGuild().addRoleToMember(member, survivingRole).queue();
                     message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> Goodluck...").queue();
-                    NNNStatus.getStatus(config, member).setUserJoined(true);
+                    status.setUserJoined(true);
+                } else {
+                    message.getChannel().sendMessage("<@" + message.getAuthor().getId() + "> You've already joined!").queue();
+                    event.getGuild().addRoleToMember(member, survivingRole).queue();
                 }
                 return;
             }
@@ -79,7 +89,9 @@ public class NNNcommands extends ListenerAdapter {
                 eb.setTitle("NNN User Status");
                 eb.addField("Username", message.getAuthor().getName(), false);
                 eb.addField("Joined", (s.hasUserJoined()) ? "True" : "False", false);
+                eb.addField("Failed", (s.hasUserFailed()) ? "True" : "False", false);
                 message.getChannel().sendMessage(eb.build()).queue();
+                return;
             }
 
             if(command.equalsIgnoreCase("help")){

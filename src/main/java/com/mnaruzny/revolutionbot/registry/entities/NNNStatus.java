@@ -61,7 +61,7 @@ public class NNNStatus {
     public boolean hasUserFailed(){
         try {
             Connection conn = new DataConnector(config).getConnection();
-            String sql = "SELECT userFailed FROM revolutionbot.rv_nnnstatus WHERE discordUserId = ? AND discordGuildId = ?";
+            String sql = "SELECT userFailed FROM revolutionbot.rv_nnnStatus WHERE discordUserId = ? AND discordGuildId = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setLong(1, member.getIdLong());
             pstmt.setLong(2, member.getGuild().getIdLong());
