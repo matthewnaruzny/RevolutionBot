@@ -2,7 +2,6 @@ package com.mnaruzny.revolutionbot;
 
 import com.mnaruzny.revolutionbot.config.ReadPropertyFile;
 import com.mnaruzny.revolutionbot.listener.commands.GeneralCommandListener;
-import com.mnaruzny.revolutionbot.listener.commands.NNNcommands;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -26,7 +25,6 @@ public class MainBot {
 
         // Register Listeners
         jda.addEventListener(new GeneralCommandListener());
-        jda.addEventListener(new NNNcommands(config));
 
     }
 }
