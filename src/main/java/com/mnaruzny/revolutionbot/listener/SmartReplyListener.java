@@ -16,10 +16,12 @@ public class SmartReplyListener extends ListenerAdapter {
     private final Classifier<String, String> messageMeaning;
     private final Hashtable<String, String[]> autoReplies;
 
-    public SmartReplyListener() throws IOException {
+    public SmartReplyListener(String path1, String path2) throws IOException {
         messageMeaning = new BayesClassifier<>();
         // Load data
-        BufferedReader repliesFile = new BufferedReader(new FileReader("learningData.csv"));
+
+        // Learning Data
+        BufferedReader repliesFile = new BufferedReader(new FileReader(path1));
         String row;
         while((row = repliesFile.readLine()) != null){
             String[] data = row.split(",");
@@ -29,7 +31,7 @@ public class SmartReplyListener extends ListenerAdapter {
         repliesFile.close();
 
         Hashtable<String, String[]> autoReplies = new Hashtable<>();
-        repliesFile = new BufferedReader(new FileReader("autoreply.csv"));
+        repliesFile = new BufferedReader(new FileReader(path2));
         while((row = repliesFile.readLine()) != null){
             String[] data = row.split(",");
             String[] temp;

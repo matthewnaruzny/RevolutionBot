@@ -22,7 +22,7 @@ public class MainBot {
         JDABuilder builder = JDABuilder.createDefault(config.getProperty("discordApiKey"));
         builder.disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE);
         builder.setBulkDeleteSplittingEnabled(false);
-        builder.setActivity(Activity.watching("the world rip itself apart"));
+        builder.setActivity(Activity.watching("society collapse"));
         JDA jda = builder.build();
 
         // Register Listeners
