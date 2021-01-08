@@ -27,8 +27,7 @@ public class MainBot {
 
         // Register Listeners
         jda.addEventListener(new GeneralCommandListener());
-        //jda.addEventListener(new LoveListener());
-        jda.addEventListener(new SmartReplyListener());
+        jda.addEventListener(new SmartReplyListener(args[1], args[2]));
 
     }
 }
