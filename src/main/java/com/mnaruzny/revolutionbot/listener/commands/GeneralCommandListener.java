@@ -13,6 +13,20 @@ public class GeneralCommandListener extends ListenerAdapter {
             String[] args = message.getContentRaw().split(" ");
             String command = args[0].substring(2);
 
+            if(command.equals("saysorry")){
+                message.getTextChannel().sendMessage("Sorry... :disappointed_relieved: ").queue();
+                return;
+            }
+
+            if(command.equals("help")){
+                String helpMessage = "--Help Menu--\n" +
+                        "so.. i don't really want to help you.. but anyways...\n" +
+                        "----\n" +
+                        "saysorry - force me to say sorry\n" +
+                        "help - display this menu";
+                message.getTextChannel().sendMessage(helpMessage).queue();
+            }
+
         }
     }
 

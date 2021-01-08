@@ -72,10 +72,16 @@ public class SmartReplyListener extends ListenerAdapter {
 
         int chance = (int) (Math.random() * (101));
         if(message.getContentRaw().contains("rev")) chance = 0;
-        if(chance < 10){
+        if(chance < 2){
             Classification<String, String> data = messageMeaning.classify(Arrays.asList(words));
             String[] temp = autoReplies.get(data.getCategory());
-            int i = (int) (Math.random() * temp.length);
+            int i;
+            try {
+                i = (int) (Math.random() * temp.length);
+            } catch (NullPointerException ex) {
+                System.out.println("NOT FOUND: " + data.getCategory());
+                return;
+            }
             String sendMessage = temp[i];
             StringBuilder s = new StringBuilder();
             s.append("<@").append(message.getAuthor().getId()).append("> ");
