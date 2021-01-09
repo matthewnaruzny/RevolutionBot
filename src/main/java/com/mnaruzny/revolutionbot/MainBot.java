@@ -33,7 +33,7 @@ public class MainBot {
         // Register Listeners
         jda.addEventListener(new GeneralCommandListener());
         jda.addEventListener(new RandomSpeak(audioController));
-        jda.addEventListener(new SmartReplyListener(args[1], args[2]));
+        jda.addEventListener(new SmartReplyListener(config.getProperty("learningdataFile", "learningData.csv"), config.getProperty("autoreplyFile", "autoreply.csv")));
 
     }
 }
