@@ -3,6 +3,7 @@ package com.mnaruzny.revolutionbot.listener;
 import de.daslaboratorium.machinelearning.classifier.Classification;
 import de.daslaboratorium.machinelearning.classifier.Classifier;
 import de.daslaboratorium.machinelearning.classifier.bayes.BayesClassifier;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -53,6 +54,7 @@ public class SmartReplyListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         Message message = event.getMessage();
         if(message.getAuthor().isBot()) return;
+        if(!event.getGuild().getSelfMember().hasPermission(event.getTextChannel(), Permission.MESSAGE_WRITE)) return;
         String[] words = message.getContentRaw().split("\\s");
         if(words[0].equals("r!train") && message.getTextChannel().getId().equals("796466460834267156")){
             String category = words[1];
