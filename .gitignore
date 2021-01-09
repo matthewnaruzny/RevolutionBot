@@ -157,3 +157,5 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij+all,windows,maven
 /config.properties
+/autoreply.csv
+/learningData.csv
