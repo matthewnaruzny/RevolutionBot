@@ -2,14 +2,12 @@ package com.mnaruzny.revolutionbot;
 
 import com.mnaruzny.revolutionbot.audio.AudioController;
 import com.mnaruzny.revolutionbot.config.ReadPropertyFile;
-import com.mnaruzny.revolutionbot.listener.LoveListener;
 import com.mnaruzny.revolutionbot.listener.RandomSpeak;
 import com.mnaruzny.revolutionbot.listener.SmartReplyListener;
 import com.mnaruzny.revolutionbot.listener.commands.GeneralCommandListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import javax.security.auth.login.LoginException;
@@ -32,7 +30,7 @@ public class MainBot {
 
         // Register Listeners
         jda.addEventListener(new GeneralCommandListener());
-        jda.addEventListener(new RandomSpeak(audioController));
+        jda.addEventListener(new RandomSpeak(audioController, config.getProperty("musiclistFile", "musiclist.txt")));
         jda.addEventListener(new SmartReplyListener(config.getProperty("learningdataFile", "learningData.csv"), config.getProperty("autoreplyFile", "autoreply.csv")));
 
     }

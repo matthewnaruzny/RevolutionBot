@@ -9,28 +9,41 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
+
 public class RandomSpeak extends ListenerAdapter {
 
     private final AudioController audioController;
+    private final String musiclistFilename;
 
-    public RandomSpeak(AudioController audioController){
+    public RandomSpeak(AudioController audioController, String musiclistFilename){
         this.audioController = audioController;
+        this.musiclistFilename = musiclistFilename;
     }
 
     @Override
     public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
         int chance = (int)(Math.random() * 100);
-        //event.getGuild().getTextChannelById("796466460834267156").sendMessage("VC Chance Val: " + chance).queue();
-        if(chance > 50 && chance < 70){
+        boolean always = false;
+
+        List<Role> roles = event.getMember().getRoles();
+        for(Role role : roles){
+            if(role.getName().equalsIgnoreCase("introduce")) always = true;
+        }
+
+        if(chance > 50 && chance < 70 || always){
             // Join Voice
             VoiceChannel channel = event.getChannelJoined();
-            if(event.getMember().getUser().isBot()) return;
+            if(event.getGuild().getSelfMember().equals(event.getMember())) return;
             if(!event.getGuild().getSelfMember().hasPermission(channel, Permission.VOICE_CONNECT)) return;
 
             AudioPlayer player = audioController.getNewPlayer();
@@ -39,29 +52,46 @@ public class RandomSpeak extends ListenerAdapter {
             player.addListener(new TrackScheduler(manager));
             manager.setSendingHandler(audioPlayerSendHandler);
             manager.openAudioConnection(channel);
-            audioController.playerManager.loadItem("https://www.youtube.com/watch?v=-nibRWOghPs", new AudioLoadResultHandler() {
-                @Override
-                public void trackLoaded(AudioTrack audioTrack) {
-                    player.playTrack(audioTrack);
-                }
+            String[] songList;
+            try {
+                songList = getSongList();
+                audioController.playerManager.loadItem(songList[(int)(Math.random() * songList.length)], new AudioLoadResultHandler() {
+                    @Override
+                    public void trackLoaded(AudioTrack audioTrack) {
+                        player.playTrack(audioTrack);
+                    }
 
-                @Override
-                public void playlistLoaded(AudioPlaylist audioPlaylist) {
+                    @Override
+                    public void playlistLoaded(AudioPlaylist audioPlaylist) {
 
-                }
+                    }
 
-                @Override
-                public void noMatches() {
-                    System.out.println("No Matches");
-                }
+                    @Override
+                    public void noMatches() {
+                        System.out.println("No Matches");
+                    }
 
-                @Override
-                public void loadFailed(FriendlyException e) {
-                    System.out.println("Load Failed");
-                }
-            });
+                    @Override
+                    public void loadFailed(FriendlyException e) {
+                        System.out.println("Load Failed");
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
 
         }
+    }
+
+    public String[] getSongList() throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(musiclistFilename));
+        LinkedList<String> songList = new LinkedList<>();
+        String row;
+        while((row = bufferedReader.readLine()) != null){
+            songList.add(row);
+        }
+        return songList.toArray(new String[0]);
     }
 }
