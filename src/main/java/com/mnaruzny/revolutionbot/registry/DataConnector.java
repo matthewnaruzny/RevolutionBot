@@ -1,5 +1,7 @@
 package com.mnaruzny.revolutionbot.registry;
 
+import com.mnaruzny.revolutionbot.registry.settings.GuildSettings;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,6 +22,10 @@ public class DataConnector {
 
         return DriverManager.getConnection(url, config.getProperty("dbUsername"), config.getProperty("dbPassword"));
 
+    }
+
+    public GuildSettings getGuildSettings(long id) throws SQLException {
+        return new GuildSettings(getConnection(), id);
     }
 
 }

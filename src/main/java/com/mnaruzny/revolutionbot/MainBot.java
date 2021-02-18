@@ -5,6 +5,7 @@ import com.mnaruzny.revolutionbot.config.ReadPropertyFile;
 import com.mnaruzny.revolutionbot.listener.RandomSpeak;
 import com.mnaruzny.revolutionbot.listener.SmartReplyListener;
 import com.mnaruzny.revolutionbot.listener.commands.GeneralCommandListener;
+import com.mnaruzny.revolutionbot.registry.DataConnector;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -27,11 +28,12 @@ public class MainBot {
         JDA jda = builder.build();
 
         AudioController audioController = new AudioController();
+        DataConnector dataConnector = new DataConnector(config);
 
         // Register Listeners
         jda.addEventListener(new GeneralCommandListener());
         jda.addEventListener(new RandomSpeak(audioController, config.getProperty("musiclistFile", "musiclist.txt")));
-        jda.addEventListener(new SmartReplyListener(config.getProperty("learningdataFile", "learningData.csv"), config.getProperty("autoreplyFile", "autoreply.csv")));
+        jda.addEventListener(new SmartReplyListener(config.getProperty("learningdataFile", "learningData.csv"), config.getProperty("autoreplyFile", "autoreply.csv"), dataConnector));
 
     }
 }

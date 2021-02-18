@@ -1,5 +1,7 @@
 package com.mnaruzny.revolutionbot.listener;
 
+import com.mnaruzny.revolutionbot.registry.DataConnector;
+import com.mnaruzny.revolutionbot.registry.settings.GuildSettings;
 import de.daslaboratorium.machinelearning.classifier.Classification;
 import de.daslaboratorium.machinelearning.classifier.Classifier;
 import de.daslaboratorium.machinelearning.classifier.bayes.BayesClassifier;
@@ -9,6 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Hashtable;
 
@@ -16,8 +19,11 @@ public class SmartReplyListener extends ListenerAdapter {
 
     private final Classifier<String, String> messageMeaning;
     private final Hashtable<String, String[]> autoReplies;
+    private final DataConnector dataConnector;
 
-    public SmartReplyListener(String path1, String path2) throws IOException {
+    public SmartReplyListener(String path1, String path2, DataConnector dataConnector) throws IOException {
+        this.dataConnector = dataConnector;
+
         messageMeaning = new BayesClassifier<>();
         // Load data
 
@@ -69,6 +75,18 @@ public class SmartReplyListener extends ListenerAdapter {
             }
             return;
         }
+        if(words[0].equals("r!childsafe")){
+            try {
+                GuildSettings guildSettings = dataConnector.getGuildSettings(message.getGuild().getIdLong());
+                boolean childSafe = guildSettings.isChildSafe();
+                guildSettings.setChildSafe(!childSafe);
+                childSafe = guildSettings.isChildSafe();
+                message.getTextChannel().sendMessage("Child safe is **" + (childSafe ? "Enabled" : "Disabled") + "**").queue();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            return;
+        }
         if(!message.getAuthor().isBot() && (message.getTextChannel().getId().equals("786481114545520650") || message.getTextChannel().getId().equals("796600359312162856"))) {
             String data = messageMeaning.classify(Arrays.asList(words)).toString();
             message.getChannel().sendMessage(data).queue();
@@ -78,6 +96,16 @@ public class SmartReplyListener extends ListenerAdapter {
         if(message.getContentRaw().contains("rev")) chance = 0;
         if(chance < 2){
             Classification<String, String> data = messageMeaning.classify(Arrays.asList(words));
+
+            boolean childSafe = true;
+            try {
+                childSafe = dataConnector.getGuildSettings(message.getGuild().getIdLong()).isChildSafe();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+
+            //TODO: Add new child list to retrieve sentences from
+
             String[] temp = autoReplies.get(data.getCategory());
             int i;
             try {
@@ -93,6 +121,12 @@ public class SmartReplyListener extends ListenerAdapter {
             message.getTextChannel().sendMessage(s.toString()).queue();
         }
 
+    }
+
+    private String getSmartMessage(String category, boolean childSafe){
+
+
+        return " ";
     }
 
     private void addToDataFile(String category, String[] features) throws IOException {
