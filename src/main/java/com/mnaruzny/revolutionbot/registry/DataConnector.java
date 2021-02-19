@@ -22,4 +22,8 @@ public class DataConnector {
 
     }
 
+    public SmartReplies getSmartReplies() throws SQLException {
+        return new SmartReplies(getConnection());
+    }
+
 }
