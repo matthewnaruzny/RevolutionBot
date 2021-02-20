@@ -3,6 +3,7 @@ package com.mnaruzny.revolutionbot;
 import com.mnaruzny.revolutionbot.audio.AudioController;
 import com.mnaruzny.revolutionbot.config.ReadPropertyFile;
 import com.mnaruzny.revolutionbot.listener.RandomSpeak;
+import com.mnaruzny.revolutionbot.listener.RemoteControl;
 import com.mnaruzny.revolutionbot.listener.SmartReplyListener;
 import com.mnaruzny.revolutionbot.listener.commands.GeneralCommandListener;
 import com.mnaruzny.revolutionbot.registry.DataConnector;
@@ -34,6 +35,7 @@ public class MainBot {
         jda.addEventListener(new GeneralCommandListener());
         jda.addEventListener(new RandomSpeak(audioController, config.getProperty("musiclistFile", "musiclist.txt")));
         jda.addEventListener(new SmartReplyListener(dataConnector));
+        jda.addEventListener(new RemoteControl(jda));
 
     }
 }
