@@ -51,7 +51,7 @@ public class SmartReplies {
 
     public void addTrainingData(String category, String[] words) throws SQLException {
         String sql = "INSERT INTO revolutionbot.rv_smartRepliesTraining (category, word) VALUES (?,?)";
-        String dbWords = Arrays.toString(words);
+        String dbWords = String.join(" ", words);
         try(PreparedStatement pstmt = connection.prepareStatement(sql)){
             pstmt.setString(1, category);
             pstmt.setString(2, dbWords);
