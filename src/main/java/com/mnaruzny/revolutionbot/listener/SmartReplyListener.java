@@ -2,6 +2,7 @@ package com.mnaruzny.revolutionbot.listener;
 
 import com.mnaruzny.revolutionbot.registry.DataConnector;
 import com.mnaruzny.revolutionbot.registry.SmartReplies;
+import com.mnaruzny.revolutionbot.registry.settings.GuildSettings;
 import de.daslaboratorium.machinelearning.classifier.Classification;
 import de.daslaboratorium.machinelearning.classifier.Classifier;
 import de.daslaboratorium.machinelearning.classifier.bayes.BayesClassifier;
@@ -38,9 +39,8 @@ public class SmartReplyListener extends ListenerAdapter {
             ex.printStackTrace();
             return;
         }
-
         training.forEach((category, wordList) -> {
-            for(String word : wordList){
+            for(String word : wordList) {
                 String[] wordSplit = word.split(" ");
                 messageMeaning.learn(category, Arrays.asList(wordSplit));
             }
@@ -68,6 +68,20 @@ public class SmartReplyListener extends ListenerAdapter {
             }
             return;
         }
+
+        if(words[0].equals("r!childsafe")){
+            try {
+                GuildSettings guildSettings = dataConnector.getGuildSettings(message.getGuild().getIdLong());
+                boolean childSafe = guildSettings.isChildSafe();
+                guildSettings.setChildSafe(!childSafe);
+                childSafe = guildSettings.isChildSafe();
+                message.getTextChannel().sendMessage("Child safe is **" + (childSafe ? "Enabled" : "Disabled") + "**").queue();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            return;
+        }
+
         if(!message.getAuthor().isBot() && (message.getTextChannel().getId().equals("786481114545520650") || message.getTextChannel().getId().equals("796600359312162856"))) {
             String data = messageMeaning.classify(Arrays.asList(words)).toString();
             message.getChannel().sendMessage(data).queue();
@@ -77,10 +91,15 @@ public class SmartReplyListener extends ListenerAdapter {
         if(message.getContentRaw().contains("rev")) chance = 0;
         if(chance < 2){
             Classification<String, String> data = messageMeaning.classify(Arrays.asList(words));
-            int i;
+            boolean childSafe = true;
+            try {
+                childSafe = dataConnector.getGuildSettings(message.getGuild().getIdLong()).isChildSafe();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
             String sendMessage = " ";
             try {
-                sendMessage = getSmartReply(data.getCategory());
+                sendMessage = getSmartReply(data.getCategory(), childSafe);
             } catch (NullPointerException ex) {
                 System.out.println("NOT FOUND: " + data.getCategory());
                 return;
@@ -94,9 +113,16 @@ public class SmartReplyListener extends ListenerAdapter {
 
     }
 
-    private String getSmartReply(String category) throws SQLException {
+    private String getSmartReply(String category, boolean childSafe) throws SQLException {
         SmartReplies smartReplies = dataConnector.getSmartReplies();
-        List<String> words = smartReplies.getReplies(category);
+        List<String> words;
+
+        if(childSafe){
+            words = smartReplies.getSafeReplies(category);
+        } else {
+            words = smartReplies.getReplies(category);
+        }
+
         int index = (int) (Math.random()*words.size());
         return words.get(index);
 

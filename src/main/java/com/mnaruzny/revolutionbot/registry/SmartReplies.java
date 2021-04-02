@@ -17,8 +17,21 @@ public class SmartReplies {
         this.connection = connection;
     }
 
-    public List<String> getReplies(String category) throws SQLException{
+    public List<String> getReplies(String category) throws SQLException {
         String sql = "SELECT * FROM revolutionbot.rv_smartWordlist WHERE category = ?";
+        List<String> words = new ArrayList<>();
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)){
+            pstmt.setString(1, category);
+            ResultSet rs = pstmt.executeQuery();
+            while(rs.next()){
+                words.add(rs.getString("word"));
+            }
+        }
+        return words;
+    }
+
+    public List<String> getSafeReplies(String category) throws SQLException {
+        String sql = "SELECT * FROM revolutionbot.rv_smartWordlist WHERE category = ? AND childsafe = 1";
         List<String> words = new ArrayList<>();
         try (PreparedStatement pstmt = connection.prepareStatement(sql)){
             pstmt.setString(1, category);
