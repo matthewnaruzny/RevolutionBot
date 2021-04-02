@@ -1,6 +1,7 @@
 package com.mnaruzny.revolutionbot.listener;
 
 import com.mnaruzny.revolutionbot.registry.DataConnector;
+import com.mnaruzny.revolutionbot.registry.SmartReplies;
 import com.mnaruzny.revolutionbot.registry.settings.GuildSettings;
 import de.daslaboratorium.machinelearning.classifier.Classification;
 import de.daslaboratorium.machinelearning.classifier.Classifier;
@@ -12,48 +13,38 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.*;
 
 public class SmartReplyListener extends ListenerAdapter {
 
     private final Classifier<String, String> messageMeaning;
-    private final Hashtable<String, String[]> autoReplies;
     private final DataConnector dataConnector;
 
-    public SmartReplyListener(String path1, String path2, DataConnector dataConnector) throws IOException {
+    public SmartReplyListener(DataConnector dataConnector){
         this.dataConnector = dataConnector;
-
         messageMeaning = new BayesClassifier<>();
         // Load data
 
         // Learning Data
-        BufferedReader repliesFile = new BufferedReader(new FileReader(path1));
-        String row;
-        while((row = repliesFile.readLine()) != null){
-            String[] data = row.split(",");
-            String[] text = data[1].split("\\s");
-            messageMeaning.learn(data[0], Arrays.asList(text));
-        }
-        repliesFile.close();
 
-        Hashtable<String, String[]> autoReplies = new Hashtable<>();
-        repliesFile = new BufferedReader(new FileReader(path2));
-        while((row = repliesFile.readLine()) != null){
-            String[] data = row.split(",");
-            String[] temp;
-            if(autoReplies.containsKey(data[0])){
-                temp = new String[autoReplies.get(data[0]).length + 1];
-                System.arraycopy(autoReplies.get(data[0]),0, temp, 0, autoReplies.get(data[0]).length);
-                temp[autoReplies.get(data[0]).length] = data[1];
-            } else {
-                temp = new String[]{data[1]};
+        SmartReplies smartReplies;
+        HashMap<String, ArrayList<String>> training;
+
+        try{
+            smartReplies = dataConnector.getSmartReplies();
+            training = smartReplies.getTrainingData();
+        } catch (SQLException ex){
+            System.out.println("** Smart Reply Listener fail to start **\n** DB Connection Error **");
+            ex.printStackTrace();
+            return;
+        }
+        training.forEach((category, wordList) -> {
+            for(String word : wordList) {
+                String[] wordSplit = word.split(" ");
+                messageMeaning.learn(category, Arrays.asList(wordSplit));
             }
-            autoReplies.put(data[0], temp);
-        }
-        repliesFile.close();
+        });
 
-        this.autoReplies = autoReplies;
     }
 
     @Override
@@ -75,6 +66,7 @@ public class SmartReplyListener extends ListenerAdapter {
             }
             return;
         }
+
         if(words[0].equals("r!childsafe")){
             try {
                 GuildSettings guildSettings = dataConnector.getGuildSettings(message.getGuild().getIdLong());
@@ -87,6 +79,7 @@ public class SmartReplyListener extends ListenerAdapter {
             }
             return;
         }
+
         if(!message.getAuthor().isBot() && (message.getTextChannel().getId().equals("786481114545520650") || message.getTextChannel().getId().equals("796600359312162856"))) {
             String data = messageMeaning.classify(Arrays.asList(words)).toString();
             message.getChannel().sendMessage(data).queue();
@@ -96,48 +89,50 @@ public class SmartReplyListener extends ListenerAdapter {
         if(message.getContentRaw().contains("rev")) chance = 0;
         if(chance < 2){
             Classification<String, String> data = messageMeaning.classify(Arrays.asList(words));
-
             boolean childSafe = true;
             try {
                 childSafe = dataConnector.getGuildSettings(message.getGuild().getIdLong()).isChildSafe();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
-
-            //TODO: Add new child list to retrieve sentences from
-
-            String[] temp = autoReplies.get(data.getCategory());
-            int i;
+            String sendMessage = " ";
             try {
-                i = (int) (Math.random() * temp.length);
+                sendMessage = getSmartReply(data.getCategory(), childSafe);
             } catch (NullPointerException ex) {
                 System.out.println("NOT FOUND: " + data.getCategory());
                 return;
+            } catch (SQLException ex){
+                ex.printStackTrace();
             }
-            String sendMessage = temp[i];
-            StringBuilder s = new StringBuilder();
-            s.append("<@").append(message.getAuthor().getId()).append("> ");
-            s.append(sendMessage);
-            message.getTextChannel().sendMessage(s.toString()).queue();
+            String s = "<@" + message.getAuthor().getId() + "> " +
+                    sendMessage;
+            message.getTextChannel().sendMessage(s).queue();
         }
 
     }
 
-    private String getSmartMessage(String category, boolean childSafe){
+    private String getSmartReply(String category, boolean childSafe) throws SQLException {
+        SmartReplies smartReplies = dataConnector.getSmartReplies();
+        List<String> words;
 
+        if(childSafe){
+            words = smartReplies.getSafeReplies(category);
+        } else {
+            words = smartReplies.getReplies(category);
+        }
 
-        return " ";
+        int index = (int) (Math.random()*words.size());
+        return words.get(index);
+
     }
 
     private void addToDataFile(String category, String[] features) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter("learningData.csv", true));
-        writer.append("\n");
-        writer.append(category).append(",");
-        for(int i = 0; i < features.length; i++){
-            writer.append(features[i]);
-            if(i != features.length-1) writer.append(" ");
+        try{
+            SmartReplies smartReplies = dataConnector.getSmartReplies();
+            smartReplies.addTrainingData(category, features);
+        } catch (SQLException ex){
+            ex.printStackTrace();
         }
-        writer.close();
     }
 
 }

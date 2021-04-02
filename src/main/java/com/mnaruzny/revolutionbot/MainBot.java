@@ -20,6 +20,7 @@ public class MainBot {
 
         // Get Config
         Properties config = ReadPropertyFile.getProperties(args[0]);
+        DataConnector dataConnector = new DataConnector(config);
 
         JDABuilder builder = JDABuilder.createDefault(config.getProperty("discordApiKey"));
         builder.disableCache(CacheFlag.MEMBER_OVERRIDES);
@@ -28,12 +29,11 @@ public class MainBot {
         JDA jda = builder.build();
 
         AudioController audioController = new AudioController();
-        DataConnector dataConnector = new DataConnector(config);
 
         // Register Listeners
         jda.addEventListener(new GeneralCommandListener());
         jda.addEventListener(new RandomSpeak(audioController, config.getProperty("musiclistFile", "musiclist.txt")));
-        jda.addEventListener(new SmartReplyListener(config.getProperty("learningdataFile", "learningData.csv"), config.getProperty("autoreplyFile", "autoreply.csv"), dataConnector));
+        jda.addEventListener(new SmartReplyListener(dataConnector));
 
     }
 }

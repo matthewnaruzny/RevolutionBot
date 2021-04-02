@@ -24,6 +24,10 @@ public class DataConnector {
 
     }
 
+    public SmartReplies getSmartReplies() throws SQLException {
+        return new SmartReplies(getConnection());
+    }
+
     public GuildSettings getGuildSettings(long id) throws SQLException {
         return new GuildSettings(getConnection(), id);
     }

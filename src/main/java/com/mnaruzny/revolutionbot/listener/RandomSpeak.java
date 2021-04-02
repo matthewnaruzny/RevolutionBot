@@ -74,6 +74,7 @@ public class RandomSpeak extends ListenerAdapter {
                     @Override
                     public void loadFailed(FriendlyException e) {
                         System.out.println("Load Failed");
+                        manager.closeAudioConnection();
                     }
                 });
             } catch (IOException e) {

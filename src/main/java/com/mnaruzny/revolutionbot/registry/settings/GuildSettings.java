@@ -1,9 +1,6 @@
 package com.mnaruzny.revolutionbot.registry.settings;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class GuildSettings {
 
@@ -20,7 +17,14 @@ public class GuildSettings {
         try(PreparedStatement pstmt = c.prepareStatement(sql)){
             pstmt.setLong(1, id);
             ResultSet rs = pstmt.executeQuery();
-            return rs.getBoolean(1);
+            boolean isChildSafe = true;
+            try{
+                rs.next();
+                isChildSafe = rs.getBoolean(1);
+            } catch (SQLDataException ex) {
+                newGuildSetting(id);
+            }
+            return isChildSafe;
         }
     }
 
@@ -28,6 +32,14 @@ public class GuildSettings {
         String sql = "UPDATE revolutionbot.rv_guildSettings SET `child-safe` = ? WHERE id = ?";
         try(PreparedStatement pstmt = c.prepareStatement(sql)){
             pstmt.setBoolean(1, childSafe);
+            pstmt.setLong(2, id);
+            pstmt.execute();
+        }
+    }
+
+    public void newGuildSetting(long id) throws SQLException {
+        String sql = "INSERT INTO revolutionbot.rv_guildSettings (id) VALUE (?)";
+        try(PreparedStatement pstmt = c.prepareStatement(sql)){
             pstmt.setLong(1, id);
             pstmt.execute();
         }
