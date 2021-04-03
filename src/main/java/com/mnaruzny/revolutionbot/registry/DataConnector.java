@@ -9,18 +9,12 @@ import java.util.Properties;
 
 public class DataConnector {
 
-    private final Properties config;
-
-    public DataConnector(Properties config){
-        this.config = config;
-    }
-
     public Connection getConnection() throws SQLException {
 
-        String ip = config.getProperty("dbIp");
+        String ip = System.getenv("DBIP");
         String url = ("jdbc:mariadb://" + ip);
 
-        return DriverManager.getConnection(url, config.getProperty("dbUsername"), config.getProperty("dbPassword"));
+        return DriverManager.getConnection(url, System.getenv("DBUSR"), System.getenv("DBPASS"));
 
     }
 
@@ -30,6 +24,10 @@ public class DataConnector {
 
     public GuildSettings getGuildSettings(long id) throws SQLException {
         return new GuildSettings(getConnection(), id);
+    }
+
+    public MusicList getMusicList() throws SQLException {
+        return new MusicList(getConnection());
     }
 
 }

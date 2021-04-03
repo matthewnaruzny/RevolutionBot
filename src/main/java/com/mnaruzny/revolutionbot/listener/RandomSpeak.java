@@ -3,6 +3,7 @@ package com.mnaruzny.revolutionbot.listener;
 import com.mnaruzny.revolutionbot.audio.AudioController;
 import com.mnaruzny.revolutionbot.audio.AudioPlayerSendHandler;
 import com.mnaruzny.revolutionbot.audio.TrackScheduler;
+import com.mnaruzny.revolutionbot.registry.DataConnector;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -17,17 +18,18 @@ import net.dv8tion.jda.api.managers.AudioManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
 public class RandomSpeak extends ListenerAdapter {
 
+    private final DataConnector dataConnector;
     private final AudioController audioController;
-    private final String musiclistFilename;
 
-    public RandomSpeak(AudioController audioController, String musiclistFilename){
+    public RandomSpeak(DataConnector dataConnector, AudioController audioController){
+        this.dataConnector = dataConnector;
         this.audioController = audioController;
-        this.musiclistFilename = musiclistFilename;
     }
 
     @Override
@@ -52,10 +54,10 @@ public class RandomSpeak extends ListenerAdapter {
             player.addListener(new TrackScheduler(manager));
             manager.setSendingHandler(audioPlayerSendHandler);
             manager.openAudioConnection(channel);
-            String[] songList;
+            List<String> songList;
             try {
                 songList = getSongList();
-                audioController.playerManager.loadItem(songList[(int)(Math.random() * songList.length)], new AudioLoadResultHandler() {
+                audioController.playerManager.loadItem(songList.get((int)(Math.random() * songList.size())), new AudioLoadResultHandler() {
                     @Override
                     public void trackLoaded(AudioTrack audioTrack) {
                         player.playTrack(audioTrack);
@@ -77,7 +79,7 @@ public class RandomSpeak extends ListenerAdapter {
                         manager.closeAudioConnection();
                     }
                 });
-            } catch (IOException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
 
@@ -86,13 +88,7 @@ public class RandomSpeak extends ListenerAdapter {
         }
     }
 
-    public String[] getSongList() throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(musiclistFilename));
-        LinkedList<String> songList = new LinkedList<>();
-        String row;
-        while((row = bufferedReader.readLine()) != null){
-            songList.add(row);
-        }
-        return songList.toArray(new String[0]);
+    public List<String> getSongList() throws SQLException {
+        return dataConnector.getMusicList().getList();
     }
 }
