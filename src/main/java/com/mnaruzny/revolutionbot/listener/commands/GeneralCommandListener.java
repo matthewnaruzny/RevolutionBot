@@ -1,10 +1,20 @@
 package com.mnaruzny.revolutionbot.listener.commands;
 
+import com.mnaruzny.revolutionbot.registry.DataConnector;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.sql.SQLException;
+import java.util.List;
+
 public class GeneralCommandListener extends ListenerAdapter {
+
+    private final DataConnector dataConnector;
+
+    public GeneralCommandListener(DataConnector dataConnector){
+        this.dataConnector = dataConnector;
+    }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event){
@@ -16,6 +26,16 @@ public class GeneralCommandListener extends ListenerAdapter {
             if(command.equals("saysorry")){
                 message.getTextChannel().sendMessage("Sorry... :disappointed_relieved: ").queue();
                 return;
+            }
+
+            if(command.equals("insult")){
+                try {
+                    List<String> insults = dataConnector.getSmartReplies().getReplies("insult");
+                    String insult = insults.get((int) (Math.random() * insults.size()));
+                    message.getTextChannel().sendMessage("<@" + message.getMentionedMembers().get(0).getId() + "> " + insult).queue();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
 
             if(command.equals("help")){

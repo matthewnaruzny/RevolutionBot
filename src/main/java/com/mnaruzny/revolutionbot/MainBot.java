@@ -27,7 +27,7 @@ public class MainBot {
         AudioController audioController = new AudioController();
 
         // Register Listeners
-        jda.addEventListener(new GeneralCommandListener());
+        jda.addEventListener(new GeneralCommandListener(dataConnector));
         jda.addEventListener(new RandomSpeak(dataConnector, audioController));
         jda.addEventListener(new SmartReplyListener(dataConnector));
         jda.addEventListener(new RemoteControl(jda));
