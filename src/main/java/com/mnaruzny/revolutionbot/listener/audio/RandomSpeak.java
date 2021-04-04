@@ -1,4 +1,4 @@
-package com.mnaruzny.revolutionbot.listener;
+package com.mnaruzny.revolutionbot.listener.audio;
 
 import com.mnaruzny.revolutionbot.audio.AudioController;
 import com.mnaruzny.revolutionbot.audio.AudioPlayerSendHandler;

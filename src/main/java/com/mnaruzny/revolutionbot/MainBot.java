@@ -1,7 +1,7 @@
 package com.mnaruzny.revolutionbot;
 
 import com.mnaruzny.revolutionbot.audio.AudioController;
-import com.mnaruzny.revolutionbot.listener.RandomSpeak;
+import com.mnaruzny.revolutionbot.listener.audio.RandomSpeak;
 import com.mnaruzny.revolutionbot.listener.RemoteControl;
 import com.mnaruzny.revolutionbot.listener.SmartReplyListener;
 import com.mnaruzny.revolutionbot.listener.commands.GeneralCommandListener;
