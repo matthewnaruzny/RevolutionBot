@@ -67,6 +67,17 @@ public class AdminCommandListener extends ListenerAdapter {
                 }
                 return;
             }
+
+            // Raise to Admin
+            if(command.equals("op")){
+                for(Member member : message.getMentionedMembers()){
+                    try {
+                        dataConnector.getMemberSettings(member.getIdLong(), member.getGuild().getIdLong()).setAdmin(true);
+                    } catch (SQLException exception) {
+                        exception.printStackTrace();
+                    }
+                }
+            }
         }
     }
 }
