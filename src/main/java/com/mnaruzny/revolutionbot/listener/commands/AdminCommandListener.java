@@ -1,6 +1,7 @@
 package com.mnaruzny.revolutionbot.listener.commands;
 
 import com.mnaruzny.revolutionbot.registry.DataConnector;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -38,7 +39,7 @@ public class AdminCommandListener extends ListenerAdapter {
                 return;
             }
 
-            if(!isAdmin) return;
+            if(!isAdmin && !message.getMember().isOwner() && !message.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
 
             // Clear chat history
             if(command.equals("kick")){
