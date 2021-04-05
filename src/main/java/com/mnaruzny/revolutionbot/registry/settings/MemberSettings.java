@@ -34,14 +34,27 @@ public class MemberSettings {
     }
 
     public void setAdmin(boolean isAdmin) throws SQLException {
-
+        String sql = "UPDATE revolutionbot.rv_guildUsers SET `isAdmin` = ? WHERE memberid = ? AND guildid = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)){
+            pstmt.setBoolean(1, isAdmin);
+            pstmt.setLong(2, memberId);
+            pstmt.setLong(3, guildId);
+            pstmt.executeUpdate();
+        } catch (SQLException ex){
+            registerMember(isAdmin);
+        }
     }
 
     private void registerMember() throws SQLException {
-        String sql = "INSERT INTO revolutionbot.rv_guildUsers (memberid, guildid) VALUES (?, ?)";
+        registerMember(false);
+    }
+
+    private void registerMember(boolean isAdmin) throws SQLException {
+        String sql = "INSERT INTO revolutionbot.rv_guildUsers (memberid, guildid, isAdmin) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, memberId);
             pstmt.setLong(2, guildId);
+            pstmt.setBoolean(3, isAdmin);
             pstmt.executeUpdate();
         }
     }
