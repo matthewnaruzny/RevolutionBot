@@ -73,6 +73,7 @@ public class AdminCommandListener extends ListenerAdapter {
                 for(Member member : message.getMentionedMembers()){
                     try {
                         dataConnector.getMemberSettings(member.getIdLong(), member.getGuild().getIdLong()).setAdmin(true);
+                        message.getTextChannel().sendMessage("Done! <@" + member.getId() + "> is now admin!").queue();
                     } catch (SQLException exception) {
                         exception.printStackTrace();
                     }
