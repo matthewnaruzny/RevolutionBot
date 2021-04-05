@@ -1,11 +1,11 @@
 package com.mnaruzny.revolutionbot.registry;
 
 import com.mnaruzny.revolutionbot.registry.settings.GuildSettings;
+import com.mnaruzny.revolutionbot.registry.settings.MemberSettings;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class DataConnector {
 
@@ -24,6 +24,10 @@ public class DataConnector {
 
     public GuildSettings getGuildSettings(long id) throws SQLException {
         return new GuildSettings(getConnection(), id);
+    }
+
+    public MemberSettings getMemberSettings(long memberid, long guildid) throws SQLException {
+        return new MemberSettings(getConnection(), memberid, guildid);
     }
 
     public MusicList getMusicList() throws SQLException {
