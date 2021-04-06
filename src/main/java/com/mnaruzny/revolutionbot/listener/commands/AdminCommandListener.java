@@ -63,7 +63,8 @@ public class AdminCommandListener extends ListenerAdapter {
             // Clear chat history
             if(command.equals("kick")){
                 for(Member member : message.getMentionedMembers()){
-                    member.kick("Rev Mad").queue();
+                    member.kick("Revolution!").queue();
+                    message.getTextChannel().sendMessage("Kicked <@" + member.getId() + ">").queue();
                 }
                 return;
             }
