@@ -76,6 +76,20 @@ public class AdminCommandListener extends ListenerAdapter {
                         dataConnector.getMemberSettings(member.getIdLong(), member.getGuild().getIdLong()).setAdmin(true);
                         message.getTextChannel().sendMessage("Done! <@" + member.getId() + "> is now admin!").queue();
                     } catch (SQLException exception) {
+                        message.getTextChannel().sendMessage("Error").queue();
+                        exception.printStackTrace();
+                    }
+                }
+            }
+
+            // Demote from Admin
+            if(command.equals("deop")){
+                for(Member member : message.getMentionedMembers()){
+                    try {
+                        dataConnector.getMemberSettings(member.getIdLong(), member.getGuild().getIdLong()).setAdmin(false);
+                        message.getTextChannel().sendMessage("Done! <@" + member.getId() + "> is no longer admin!").queue();
+                    } catch (SQLException exception){
+                        message.getTextChannel().sendMessage("Error").queue();
                         exception.printStackTrace();
                     }
                 }
