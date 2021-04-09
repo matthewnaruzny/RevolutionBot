@@ -10,14 +10,18 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class AdminCommandListener extends ListenerAdapter {
 
+    private final HashMap<Long, List<Long>> purgeList;
     private final DataConnector dataConnector;
 
     public AdminCommandListener(DataConnector dataConnector){
         this.dataConnector = dataConnector;
+        purgeList = new HashMap<>();
     }
 
     @Override
@@ -93,6 +97,53 @@ public class AdminCommandListener extends ListenerAdapter {
                         exception.printStackTrace();
                     }
                 }
+            }
+
+            // Purge Function Commands
+            if(command.equals("purge")){
+
+                if(!purgeList.containsKey(message.getGuild().getIdLong())){
+                    purgeList.put(message.getGuild().getIdLong(), new ArrayList<>());
+                }
+
+                List<Long> toPurge = purgeList.get(message.getGuild().getIdLong());
+
+                if(args[2].equals("add")){
+                    for(Member member : message.getMentionedMembers())
+                        toPurge.add(member.getIdLong());
+                    return;
+                }
+                if(args[2].equals("del")){
+                    for(Member member : message.getMentionedMembers())
+                        toPurge.remove(member.getIdLong());
+                    return;
+                }
+                if(args[2].equals("list")){
+                    //EmbedBuilder eb = new EmbedBuilder();
+                    //eb.setTitle("To Purge...");
+                    StringBuilder sb = new StringBuilder();
+
+                    for(Long memId : toPurge)
+                        sb.append(memId + "\n");
+                        //eb.addField("User: ", message.getGuild().getMemberById(memId).getEffectiveName(), false);
+
+                    message.getTextChannel().sendMessage(sb.toString()).queue();
+                    return;
+                }
+                if(args[2].equals("purge")){
+                    for(Long memId : toPurge)
+                        message.getGuild().getMemberById(memId).kick("It happened").queue();
+                    return;
+                }
+
+                // Purge Help Menu
+                message.getTextChannel().sendMessage("--Purge Time--\n" +
+                        "add - Add user to purge list\n" +
+                        "del - Remove user from purge list\n" +
+                        "list - Display purge list\n" +
+                        "purge - Purge the purge list\n").queue();
+                return;
+
             }
         }
     }
