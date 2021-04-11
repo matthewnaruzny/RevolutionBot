@@ -16,7 +16,7 @@ import java.util.List;
 
 public class AdminCommandListener extends ListenerAdapter {
 
-    private final HashMap<Long, List<Long>> purgeList;
+    private final HashMap<Long, List<Member>> purgeList;
     private final DataConnector dataConnector;
 
     public AdminCommandListener(DataConnector dataConnector){
@@ -106,16 +106,15 @@ public class AdminCommandListener extends ListenerAdapter {
                     purgeList.put(message.getGuild().getIdLong(), new ArrayList<>());
                 }
 
-                List<Long> toPurge = purgeList.get(message.getGuild().getIdLong());
+                List<Member> toPurge = purgeList.get(message.getGuild().getIdLong());
 
                 if(args[2].equals("add")){
-                    for(Member member : message.getMentionedMembers())
-                        toPurge.add(member.getIdLong());
+                    toPurge.addAll(message.getMentionedMembers());
                     return;
                 }
                 if(args[2].equals("del")){
                     for(Member member : message.getMentionedMembers())
-                        toPurge.remove(member.getIdLong());
+                        toPurge.remove(member);
                     return;
                 }
                 if(args[2].equals("list")){
@@ -123,16 +122,16 @@ public class AdminCommandListener extends ListenerAdapter {
                     //eb.setTitle("To Purge...");
                     StringBuilder sb = new StringBuilder();
 
-                    for(Long memId : toPurge)
-                        sb.append(memId + "\n");
+                    for(Member member : toPurge)
+                        sb.append(member.getNickname() + "\n");
                         //eb.addField("User: ", message.getGuild().getMemberById(memId).getEffectiveName(), false);
 
                     message.getTextChannel().sendMessage(sb.toString()).queue();
                     return;
                 }
                 if(args[2].equals("purge")){
-                    for(Long memId : toPurge)
-                        message.getGuild().getMemberById(memId).kick("It happened").queue();
+                    for(Member member : toPurge)
+                        member.kick("It happened").queue();
                     return;
                 }
 
