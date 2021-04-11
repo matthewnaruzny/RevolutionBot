@@ -109,7 +109,10 @@ public class AdminCommandListener extends ListenerAdapter {
                 List<Member> toPurge = purgeList.get(message.getGuild().getIdLong());
 
                 if(args[2].equals("add")){
-                    toPurge.addAll(message.getMentionedMembers());
+                    for(Member member : message.getMentionedMembers()){
+                        message.getTextChannel().sendMessage("Added <@" + member.getId() + ">").queue();
+                        toPurge.add(member);
+                    }
                     return;
                 }
                 if(args[2].equals("del")){
@@ -118,21 +121,27 @@ public class AdminCommandListener extends ListenerAdapter {
                     return;
                 }
                 if(args[2].equals("list")){
-                    //EmbedBuilder eb = new EmbedBuilder();
-                    //eb.setTitle("To Purge...");
                     StringBuilder sb = new StringBuilder();
-
+                    sb.append("Purge List");
                     for(Member member : toPurge)
-                        sb.append(member.getNickname() + "\n");
-                        //eb.addField("User: ", message.getGuild().getMemberById(memId).getEffectiveName(), false);
+                        sb.append("<@" + member.getIdLong() + ">\n");
 
                     message.getTextChannel().sendMessage(sb.toString()).queue();
                     return;
                 }
                 if(args[2].equals("purge")){
-                    for(Member member : toPurge)
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Purged:");
+                    for(Member member : toPurge){
+                        sb.append("<@" + member.getIdLong() + ">\n");
                         member.kick("It happened").queue();
+                    }
+                    message.getTextChannel().sendMessage(sb.toString()).queue();
                     return;
+                }
+                if(args[2].equals("clear")){
+                    toPurge.clear();
+                    message.getTextChannel().sendMessage("Cleared!").queue();
                 }
 
                 // Purge Help Menu
