@@ -10,14 +10,18 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class AdminCommandListener extends ListenerAdapter {
 
+    private final HashMap<Long, List<Member>> purgeList;
     private final DataConnector dataConnector;
 
     public AdminCommandListener(DataConnector dataConnector){
         this.dataConnector = dataConnector;
+        purgeList = new HashMap<>();
     }
 
     @Override
@@ -93,6 +97,61 @@ public class AdminCommandListener extends ListenerAdapter {
                         exception.printStackTrace();
                     }
                 }
+            }
+
+            // Purge Function Commands
+            if(command.equals("purge")){
+
+                if(!purgeList.containsKey(message.getGuild().getIdLong())){
+                    purgeList.put(message.getGuild().getIdLong(), new ArrayList<>());
+                }
+
+                List<Member> toPurge = purgeList.get(message.getGuild().getIdLong());
+
+                if(args[2].equals("add")){
+                    for(Member member : message.getMentionedMembers()){
+                        message.getTextChannel().sendMessage("Added <@" + member.getId() + ">").queue();
+                        toPurge.add(member);
+                    }
+                    return;
+                }
+                if(args[2].equals("del")){
+                    for(Member member : message.getMentionedMembers())
+                        toPurge.remove(member);
+                    return;
+                }
+                if(args[2].equals("list")){
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Purge List");
+                    for(Member member : toPurge)
+                        sb.append("<@" + member.getIdLong() + ">\n");
+
+                    message.getTextChannel().sendMessage(sb.toString()).queue();
+                    return;
+                }
+                if(args[2].equals("purge")){
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Purged:");
+                    for(Member member : toPurge){
+                        sb.append("<@" + member.getIdLong() + ">\n");
+                        member.kick("It happened").queue();
+                    }
+                    message.getTextChannel().sendMessage(sb.toString()).queue();
+                    return;
+                }
+                if(args[2].equals("clear")){
+                    toPurge.clear();
+                    message.getTextChannel().sendMessage("Cleared!").queue();
+                }
+
+                // Purge Help Menu
+                message.getTextChannel().sendMessage("--Purge Time--\n" +
+                        "add - Add user to purge list\n" +
+                        "del - Remove user from purge list\n" +
+                        "list - Display purge list\n" +
+                        "purge - Purge the purge list\n").queue();
+                return;
+
             }
         }
     }
