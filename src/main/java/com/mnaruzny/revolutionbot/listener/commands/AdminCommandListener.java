@@ -48,6 +48,8 @@ public class AdminCommandListener extends ListenerAdapter {
 
             if(command.equals("mrping")){
 
+                message.getTextChannel().sendMessage("https://cdn.discordapp.com/attachments/619735741089579009/833208288044384296/image0.png").queue();
+
                 String mentionMessage;
                 if(message.getMentionedMembers().size() == 0){
                     mentionMessage = message.getGuild().getPublicRole().getAsMention();
