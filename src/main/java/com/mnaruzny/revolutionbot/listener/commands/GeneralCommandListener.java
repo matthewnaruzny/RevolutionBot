@@ -27,24 +27,7 @@ public class GeneralCommandListener extends ListenerAdapter {
             String command = args[0].substring(2);
 
             if(command.equals("mrping")){
-                TextChannel textChannel = message.getTextChannel();
-                textChannel.sendMessage("https://cdn.discordapp.com/attachments/619735741089579009/833208288044384296/image0.png").queue();
-
-                String toMention;
-
-                if(message.getMentionedMembers().size() != 0){
-                    StringBuilder sb = new StringBuilder();
-                    for(Member member : message.getMentionedMembers()){
-                        sb.append(member.getAsMention());
-                    }
-                    toMention = sb.toString();
-                } else {
-                    toMention = message.getGuild().getPublicRole().getAsMention();
-                }
-
-                for(int i = 0; i < 19; i++){
-                    textChannel.sendMessage(toMention).queue();
-                }
+                message.getTextChannel().sendMessage("https://tenor.com/view/discord-bongo-cat-bongo-cat-at-everyone-gif-12569290").queue();
                 return;
             }
 
