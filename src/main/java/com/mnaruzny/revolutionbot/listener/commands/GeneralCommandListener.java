@@ -3,6 +3,7 @@ package com.mnaruzny.revolutionbot.listener.commands;
 import com.mnaruzny.revolutionbot.registry.DataConnector;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -24,6 +25,15 @@ public class GeneralCommandListener extends ListenerAdapter {
             Message message = event.getMessage();
             String[] args = message.getContentRaw().split(" ");
             String command = args[0].substring(2);
+
+            if(command.equals("mrping")){
+                TextChannel textChannel = message.getTextChannel();
+                for(int i = 0; i < 19; i++){
+                    message.getGuild().getPublicRole().getAsMention();
+                    textChannel.sendMessage(message.getGuild().getPublicRole().getAsMention()).queue();
+                }
+                return;
+            }
 
             if(command.equals("saysorry")){
                 message.getTextChannel().sendMessage("Sorry... :disappointed_relieved: ").queue();
