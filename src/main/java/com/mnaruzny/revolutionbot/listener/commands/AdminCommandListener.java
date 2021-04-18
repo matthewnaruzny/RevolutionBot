@@ -46,6 +46,25 @@ public class AdminCommandListener extends ListenerAdapter {
 
             if(!isAdmin && !message.getMember().isOwner() && !message.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
 
+            if(command.equals("mrping")){
+
+                String mentionMessage;
+                if(message.getMentionedMembers().size() == 0){
+                    mentionMessage = message.getGuild().getPublicRole().getAsMention();
+                } else {
+                    StringBuilder sb = new StringBuilder();
+                    for(Member member : message.getMentionedMembers()){
+                        sb.append(member.getAsMention());
+                    }
+                    mentionMessage = sb.toString();
+                }
+
+                for(int i = 0; i < 19; i++){
+                    message.getTextChannel().sendMessage(mentionMessage).queue();
+                }
+                return;
+            }
+
             if(command.equals("status")){
                 for(Member member : message.getMentionedMembers()){
                     try {
