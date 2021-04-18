@@ -28,6 +28,7 @@ public class GeneralCommandListener extends ListenerAdapter {
 
             if(command.equals("mrping")){
                 TextChannel textChannel = message.getTextChannel();
+                textChannel.sendMessage("https://i.kym-cdn.com/photos/images/facebook/001/360/332/d37.jpg").queue();
                 for(int i = 0; i < 19; i++){
                     message.getGuild().getPublicRole().getAsMention();
                     textChannel.sendMessage(message.getGuild().getPublicRole().getAsMention()).queue();
