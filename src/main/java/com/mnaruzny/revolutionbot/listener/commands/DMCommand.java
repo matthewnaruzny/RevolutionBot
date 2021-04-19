@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.sql.SQLException;
@@ -39,7 +40,13 @@ public class DMCommand extends ListenerAdapter {
             if(args.length > 2) limit = Integer.parseInt(args[2]);
 
             message.getPrivateChannel().sendMessage("*Audit Log Fetch*\nGuild: " + guildId).queue();
-            List<AuditLogEntry> entries = message.getJDA().getGuildById(guildId).retrieveAuditLogs().complete();
+            List<AuditLogEntry> entries;
+            try {
+                entries = message.getJDA().getGuildById(guildId).retrieveAuditLogs().complete();
+            } catch (InsufficientPermissionException ex){
+                message.getPrivateChannel().sendMessage("*Insufficient Permission*").queue();
+                return;
+            }
             int x = 0;
             for(AuditLogEntry entry : entries){
                 x++;
