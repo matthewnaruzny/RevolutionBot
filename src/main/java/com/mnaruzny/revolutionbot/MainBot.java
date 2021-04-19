@@ -5,6 +5,7 @@ import com.mnaruzny.revolutionbot.listener.audio.RandomSpeak;
 import com.mnaruzny.revolutionbot.listener.RemoteControl;
 import com.mnaruzny.revolutionbot.listener.SmartReplyListener;
 import com.mnaruzny.revolutionbot.listener.commands.AdminCommandListener;
+import com.mnaruzny.revolutionbot.listener.commands.DMCommand;
 import com.mnaruzny.revolutionbot.listener.commands.GeneralCommandListener;
 import com.mnaruzny.revolutionbot.registry.DataConnector;
 import net.dv8tion.jda.api.JDA;
@@ -30,6 +31,7 @@ public class MainBot {
         // Register Listeners
         jda.addEventListener(new GeneralCommandListener(dataConnector));
         jda.addEventListener(new AdminCommandListener(dataConnector));
+        jda.addEventListener(new DMCommand(dataConnector));
 
         jda.addEventListener(new RandomSpeak(dataConnector, audioController));
         jda.addEventListener(new SmartReplyListener(dataConnector));
