@@ -1,6 +1,7 @@
 package com.mnaruzny.revolutionbot.listener.commands;
 
 import com.mnaruzny.revolutionbot.registry.DataConnector;
+import com.mnaruzny.revolutionbot.registry.settings.GuildSettings;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -45,6 +46,18 @@ public class AdminCommandListener extends ListenerAdapter {
             }
 
             if(!isAdmin && !message.getMember().isOwner() && !message.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
+
+            if(command.equals("morning")){
+                long channelId = Long.parseLong(args[2]);
+                try {
+                    GuildSettings guildSettings = dataConnector.getGuildSettings(message.getGuild().getIdLong());
+                    guildSettings.setMorningChannel(channelId);
+                    message.getTextChannel().sendMessage("Morning Announcement Channel Updated!").queue();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+
+            }
 
             if(command.equals("mrping")){
 

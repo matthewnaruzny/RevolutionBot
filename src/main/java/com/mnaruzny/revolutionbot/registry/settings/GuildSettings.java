@@ -28,13 +28,30 @@ public class GuildSettings {
         }
     }
 
-    public void setChildSafe(boolean childSafe) throws SQLException{
+    public void setChildSafe(boolean childSafe) throws SQLException {
         String sql = "UPDATE revolutionbot.rv_guildSettings SET `child-safe` = ? WHERE id = ?";
         try(PreparedStatement pstmt = c.prepareStatement(sql)){
             pstmt.setBoolean(1, childSafe);
             pstmt.setLong(2, id);
             pstmt.execute();
+        }  catch (SQLDataException ex) {
+            newGuildSetting(id);
         }
+    }
+
+    public void setMorningChannel(long channel) throws SQLException {
+        String sql = "UPDATE revolutionbot.rv_guildSettings SET `morningannounce` = ? WHERE id = ?";
+        try(PreparedStatement pstmt = c.prepareStatement(sql)){
+            pstmt.setLong(1, channel);
+            pstmt.setLong(2, id);
+            pstmt.execute();
+        }  catch (SQLDataException ex) {
+            newGuildSetting(id);
+        }
+    }
+
+    public long getMorningChannel() throws SQLException {
+        return 0;
     }
 
     public void newGuildSetting(long id) throws SQLException {
