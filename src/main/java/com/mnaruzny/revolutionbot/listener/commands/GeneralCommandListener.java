@@ -26,6 +26,12 @@ public class GeneralCommandListener extends ListenerAdapter {
             String[] args = message.getContentRaw().split(" ");
             String command = args[0].substring(2);
 
+            if(command.equals("hi")){
+                for(Member member : message.getMentionedMembers()){
+                    message.getTextChannel().sendMessage("Hi <@" + member.getId() + "> !").queue();
+                }
+            }
+
             if(command.equals("suicide")){
                 message.getTextChannel().sendMessage("Goodbye Cruel Word...").queue();
                 message.getMember().kick().queue();
