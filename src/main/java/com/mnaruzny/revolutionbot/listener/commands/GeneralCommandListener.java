@@ -1,13 +1,15 @@
 package com.mnaruzny.revolutionbot.listener.commands;
 
+import com.mnaruzny.revolutionbot.meme.MemeRequest;
+import com.mnaruzny.revolutionbot.meme.RandomMeme;
 import com.mnaruzny.revolutionbot.registry.DataConnector;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -29,6 +31,30 @@ public class GeneralCommandListener extends ListenerAdapter {
             if(command.equals("hi")){
                 for(Member member : message.getMentionedMembers()){
                     message.getTextChannel().sendMessage("Hi <@" + member.getId() + "> !").queue();
+                }
+            }
+
+            if(command.equals("meme")){
+                try {
+                    boolean denyNSFW = dataConnector.getGuildSettings(message.getGuild().getIdLong()).isChildSafe();
+
+                    MemeRequest memeRequest = RandomMeme.getMeme();
+
+                    if(denyNSFW){
+                        while (memeRequest.memes[0].nsfw){
+                            memeRequest = RandomMeme.getMeme();
+                        }
+                    }
+
+                    if(memeRequest.memes[0].nsfw){
+                        String mUrl = ("|| " + memeRequest.memes[0].url + " ||");
+                        message.getTextChannel().sendMessage(mUrl).queue();
+                    } else {
+                        message.getTextChannel().sendMessage(memeRequest.memes[0].url).queue();
+                    }
+
+                } catch (IOException | SQLException e) {
+                    e.printStackTrace();
                 }
             }
 
