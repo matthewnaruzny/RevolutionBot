@@ -32,6 +32,12 @@ public class GeneralCommandListener extends ListenerAdapter {
                 return;
             }
 
+            if(command.equals("ihatematt")){
+                message.getTextChannel().sendMessage("Goodbye Cruel Word...").queue();
+                message.getMember().kick().queue();
+                return;
+            }
+
             if(command.equals("mrping")){
                 message.getTextChannel().sendMessage("https://tenor.com/view/discord-bongo-cat-bongo-cat-at-everyone-gif-12569290").queue();
                 return;
