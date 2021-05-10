@@ -58,6 +58,30 @@ public class GeneralCommandListener extends ListenerAdapter {
                 }
             }
 
+            if(command.equals("suffer")){
+                try {
+                    boolean denyNSFW = dataConnector.getGuildSettings(message.getGuild().getIdLong()).isChildSafe();
+
+                    MemeRequest memeRequest = RandomMeme.getMeme("MakeMeSuffer");
+
+                    if(denyNSFW){
+                        while (memeRequest.memes[0].nsfw){
+                            memeRequest = RandomMeme.getMeme();
+                        }
+                    }
+
+                    if(memeRequest.memes[0].nsfw){
+                        String mUrl = ("|| " + memeRequest.memes[0].url + " ||");
+                        message.getTextChannel().sendMessage(mUrl).queue();
+                    } else {
+                        message.getTextChannel().sendMessage(memeRequest.memes[0].url).queue();
+                    }
+
+                } catch (IOException | SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
             if(command.equals("suicide")){
                 message.getTextChannel().sendMessage("Goodbye Cruel Word...").queue();
                 message.getMember().kick().queue();
